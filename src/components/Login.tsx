@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Lock, Mail, Eye, EyeOff, Store } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { ApiService } from '../services/api';
 
 interface LoginProps {
-  onLogin: () => void;
+  onLogin: (token: string) => void;
+  onOTPRequired: (email: string) => void;
 }
 
-export const Login: React.FC<LoginProps> = ({ onLogin }) => {
+export const Login: React.FC<LoginProps> = ({ onLogin, onOTPRequired }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -17,14 +19,17 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setError('');
     setIsLoading(true);
 
-    // Simulate loading delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Static credentials check
-    if (email === 'ankush282000@gmail.com' && password === '12345678') {
-      onLogin();
-    } else {
-      setError('Invalid email or password. Please try again.');
+    try {
+      const response = await ApiService.login(email, password);
+      
+      if (response.success) {
+        // OTP sent, move to verification
+        onOTPRequired(email);
+      } else {
+        setError(response.message || 'Login failed. Please try again.');
+      }
+    } catch (error) {
+      setError('Network error. Please check your connection and try again.');
     }
     
     setIsLoading(false);
@@ -36,7 +41,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
         {/* Logo/Header */}
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-[200px] rounded-full">
-            {/* <Store className="h-8 w-8 text-white" /> */}
             <img src="/logo.png" alt="Logo" className="text-white" />
           </div>
         </div>
@@ -115,14 +119,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             </button>
           </form>
 
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 mb-2 font-medium">Demo Credentials:</p>
-            <div className="text-xs text-gray-500 space-y-1">
-              <p><strong>Email:</strong> ankush282000@gmail.com</p>
-              <p><strong>Password:</strong> 12345678</p>
-            </div>
-          </div>
         </div>
 
         {/* Footer */}

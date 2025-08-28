@@ -20,9 +20,20 @@ export interface OrderItem {
 export interface Order {
   id: number;
   date: string;
+  customerPhone?: string;
   items: OrderItem[];
   total: number;
   profit: number;
 }
 
-export type ActiveTab = 'products' | 'cart' | 'history' | 'add-product';</parameter>
+export type ActiveTab = 'products' | 'cart' | 'history' | 'add-product';
+
+export interface AuthResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface VerifyOTPResponse {
+  success: boolean;
+  token: string;
+}

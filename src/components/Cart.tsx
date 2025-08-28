@@ -1,12 +1,12 @@
 import React from 'react';
-import { ShoppingCart, Plus, Minus, Check, Trash2 } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Check, Trash2, Phone } from 'lucide-react';
 import { CartItem } from '../types';
 
 interface CartProps {
   cartItems: CartItem[];
   onUpdateQuantity: (id: number, quantity: number) => void;
   onRemoveItem: (id: number) => void;
-  onConfirmSale: () => void;
+  onConfirmSale: (customerPhone?: string) => void;
 }
 
 export const Cart: React.FC<CartProps> = ({
@@ -15,6 +15,8 @@ export const Cart: React.FC<CartProps> = ({
   onRemoveItem,
   onConfirmSale
 }) => {
+  const [customerPhone, setCustomerPhone] = useState('');
+  
   const totalAmount = cartItems.reduce(
     (sum, item) => sum + item.retailPrice * item.cartQuantity,
     0
@@ -24,6 +26,11 @@ export const Cart: React.FC<CartProps> = ({
     (sum, item) => sum + (item.retailPrice - item.wholesalePrice) * item.cartQuantity,
     0
   );
+
+  const handleConfirmSale = () => {
+    onConfirmSale(customerPhone.trim() || undefined);
+    setCustomerPhone(''); // Clear phone after sale
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -119,8 +126,23 @@ export const Cart: React.FC<CartProps> = ({
         </div>
       </div>
       
+      {/* Customer Phone (Optional) */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          <Phone className="inline h-4 w-4 mr-1" />
+          Customer Phone (Optional)
+        </label>
+        <input
+          type="tel"
+          value={customerPhone}
+          onChange={(e) => setCustomerPhone(e.target.value)}
+          placeholder="Enter customer phone number"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+      
       <button
-        onClick={onConfirmSale}
+        onClick={handleConfirmSale}
         className="w-full bg-green-600 text-white py-4 px-6 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-green-700 active:bg-green-800 transition-colors"
       >
         <Check className="h-5 w-5" />

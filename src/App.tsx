@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Login } from './components/Login';
+import { VerifyOTP } from './components/VerifyOTP';
 import { ProductsDashboard } from './components/ProductsDashboard';
 import { Cart } from './components/Cart';
 import { SalesHistory } from './components/SalesHistory';
 import { AddProduct } from './components/AddProduct';
 import { Navigation } from './components/Navigation';
+import { ApiService } from './services/api';
 import { initialProducts, initialOrders } from './data/dummyData';
 import { Product, CartItem, Order, ActiveTab, OrderItem } from './types';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showOTPVerification, setShowOTPVerification] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
   const [activeTab, setActiveTab] = useState<ActiveTab>('products');
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -18,8 +22,8 @@ function App() {
   // Load data from localStorage on mount
   useEffect(() => {
     // Check if user was previously authenticated
-    const authStatus = localStorage.getItem('pos-authenticated');
-    if (authStatus === 'true') {
+    const token = ApiService.getToken();
+    if (token) {
       setIsAuthenticated(true);
     }
     
@@ -44,14 +48,27 @@ function App() {
     localStorage.setItem('pos-orders', JSON.stringify(orders));
   }, [orders]);
 
-  const handleLogin = () => {
+  const handleOTPRequired = (email: string) => {
+    setLoginEmail(email);
+    setShowOTPVerification(true);
+  };
+
+  const handleOTPVerified = (token: string) => {
     setIsAuthenticated(true);
-    localStorage.setItem('pos-authenticated', 'true');
+    setShowOTPVerification(false);
+    setLoginEmail('');
+  };
+
+  const handleBackToLogin = () => {
+    setShowOTPVerification(false);
+    setLoginEmail('');
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('pos-authenticated');
+    setShowOTPVerification(false);
+    setLoginEmail('');
+    ApiService.clearToken();
     setCartItems([]); // Clear cart on logout
     setActiveTab('products'); // Reset to products tab
   };
@@ -104,7 +121,7 @@ function App() {
     setCartItems(prev => prev.filter(item => item.id !== id));
   };
 
-  const handleConfirmSale = () => {
+  const handleConfirmSale = (customerPhone?: string) => {
     if (cartItems.length === 0) return;
 
     // Calculate totals
@@ -129,6 +146,7 @@ function App() {
     const newOrder: Order = {
       id: Math.max(...orders.map(o => o.id), 100) + 1,
       date: new Date().toISOString().split('T')[0],
+      customerPhone,
       items: orderItems,
       total: totalAmount,
       profit: totalProfit
@@ -164,9 +182,25 @@ function App() {
   const cartItemsCount = cartItems.reduce((sum, item) => sum + item.cartQuantity, 0);
   const existingCategories = Array.from(new Set(products.map(product => product.category)));
 
+  // Show OTP verification screen
+  if (showOTPVerification) {
+    return (
+      <VerifyOTP
+        email={loginEmail}
+        onVerified={handleOTPVerified}
+        onBack={handleBackToLogin}
+      />
+    );
+  }
+
   // Show login screen if not authenticated
   if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
+    return (
+      <Login
+        onLogin={handleOTPVerified}
+        onOTPRequired={handleOTPRequired}
+      />
+    );
   }
 
   const renderActiveTab = () => {
