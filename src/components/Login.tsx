@@ -37,16 +37,16 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onOTPRequired }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
+      <div className="max-w-md w-full lg:max-w-lg">
         {/* Logo/Header */}
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-[200px] rounded-full">
+          <div className="inline-flex items-center justify-center w-[200px] lg:w-[250px] rounded-full">
             <img src="/logo.png" alt="Logo" className="text-white" />
           </div>
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 lg:p-10">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>

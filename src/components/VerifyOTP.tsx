@@ -85,7 +85,7 @@ export const VerifyOTP: React.FC<VerifyOTPProps> = ({ email, onVerified, onBack 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
+      <div className="max-w-md w-full lg:max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
@@ -99,7 +99,7 @@ export const VerifyOTP: React.FC<VerifyOTPProps> = ({ email, onVerified, onBack 
         </div>
 
         {/* OTP Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 lg:p-10">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* OTP Input */}
             <div>
