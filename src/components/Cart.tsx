@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ShoppingCart, Plus, Minus, Check, Trash2, Phone } from 'lucide-react';
 import { CartItem } from '../types';
 
@@ -34,7 +34,7 @@ export const Cart: React.FC<CartProps> = ({
 
   if (cartItems.length === 0) {
     return (
-      <div className="p-4 pb-20">
+      <div className="p-4 pb-20 lg:pb-4 lg:pt-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Cart</h1>
         
         <div className="text-center py-12">
@@ -47,107 +47,116 @@ export const Cart: React.FC<CartProps> = ({
   }
 
   return (
-    <div className="p-4 pb-20">
+    <div className="p-4 pb-20 lg:pb-4 lg:pt-6">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Cart</h1>
       
-      <div className="space-y-4 mb-6">
-        {cartItems.map((item) => (
-          <div key={item.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-            <div className="flex justify-between items-start mb-3">
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                <p className="text-blue-600 font-medium">₹{item.retailPrice} each</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Cart Items */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900 lg:block hidden">Items</h2>
+          {cartItems.map((item) => (
+            <div key={item.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">{item.name}</h3>
+                  <p className="text-blue-600 font-medium">₹{item.retailPrice} each</p>
+                </div>
+                
+                <button
+                  onClick={() => onRemoveItem(item.id)}
+                  className="p-1 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
               
-              <button
-                onClick={() => onRemoveItem(item.id)}
-                className="p-1 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => onUpdateQuantity(item.id, item.cartQuantity - 1)}
-                  disabled={item.cartQuantity <= 1}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <Minus className="h-4 w-4" />
-                </button>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => onUpdateQuantity(item.id, item.cartQuantity - 1)}
+                    disabled={item.cartQuantity <= 1}
+                    className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  
+                  <span className="font-semibold text-lg min-w-[2rem] text-center">
+                    {item.cartQuantity}
+                  </span>
+                  
+                  <button
+                    onClick={() => onUpdateQuantity(item.id, item.cartQuantity + 1)}
+                    disabled={item.cartQuantity >= item.quantity}
+                    className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
                 
-                <span className="font-semibold text-lg min-w-[2rem] text-center">
-                  {item.cartQuantity}
+                <div className="text-right">
+                  <p className="font-bold text-lg text-gray-900">
+                    ₹{item.retailPrice * item.cartQuantity}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Profit: ₹{(item.retailPrice - item.wholesalePrice) * item.cartQuantity}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Order Summary */}
+        <div className="lg:sticky lg:top-6 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900 lg:block hidden">Order Summary</h2>
+          
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Items:</span>
+                <span className="font-medium">
+                  {cartItems.reduce((sum, item) => sum + item.cartQuantity, 0)}
                 </span>
-                
-                <button
-                  onClick={() => onUpdateQuantity(item.id, item.cartQuantity + 1)}
-                  disabled={item.cartQuantity >= item.quantity}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
               </div>
               
-              <div className="text-right">
-                <p className="font-bold text-lg text-gray-900">
-                  ₹{item.retailPrice * item.cartQuantity}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Profit: ₹{(item.retailPrice - item.wholesalePrice) * item.cartQuantity}
-                </p>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Total Profit:</span>
+                <span className="font-medium text-green-600">₹{totalProfit}</span>
+              </div>
+              
+              <div className="border-t pt-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-semibold text-gray-900">Total:</span>
+                  <span className="text-xl font-bold text-blue-600">₹{totalAmount}</span>
+                </div>
               </div>
             </div>
           </div>
-        ))}
-      </div>
-      
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600">Items:</span>
-            <span className="font-medium">
-              {cartItems.reduce((sum, item) => sum + item.cartQuantity, 0)}
-            </span>
+          
+          {/* Customer Phone (Optional) */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Phone className="inline h-4 w-4 mr-1" />
+              Customer Phone (Optional)
+            </label>
+            <input
+              type="tel"
+              value={customerPhone}
+              onChange={(e) => setCustomerPhone(e.target.value)}
+              placeholder="Enter customer phone number"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
           </div>
           
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600">Total Profit:</span>
-            <span className="font-medium text-green-600">₹{totalProfit}</span>
-          </div>
-          
-          <div className="border-t pt-2">
-            <div className="flex justify-between items-center">
-              <span className="text-lg font-semibold text-gray-900">Total:</span>
-              <span className="text-xl font-bold text-blue-600">₹{totalAmount}</span>
-            </div>
-          </div>
+          <button
+            onClick={handleConfirmSale}
+            className="w-full bg-green-600 text-white py-4 px-6 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-green-700 active:bg-green-800 transition-colors"
+          >
+            <Check className="h-5 w-5" />
+            <span>Confirm Sale</span>
+          </button>
         </div>
       </div>
-      
-      {/* Customer Phone (Optional) */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          <Phone className="inline h-4 w-4 mr-1" />
-          Customer Phone (Optional)
-        </label>
-        <input
-          type="tel"
-          value={customerPhone}
-          onChange={(e) => setCustomerPhone(e.target.value)}
-          placeholder="Enter customer phone number"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-      </div>
-      
-      <button
-        onClick={handleConfirmSale}
-        className="w-full bg-green-600 text-white py-4 px-6 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-green-700 active:bg-green-800 transition-colors"
-      >
-        <Check className="h-5 w-5" />
-        <span>Confirm Sale</span>
-      </button>
     </div>
   );
 };

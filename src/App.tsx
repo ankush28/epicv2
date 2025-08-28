@@ -232,7 +232,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-md mx-auto bg-white min-h-screen shadow-lg">
+      <div className="max-w-md lg:max-w-6xl mx-auto bg-white min-h-screen lg:shadow-lg">
         {renderActiveTab()}
         
         <Navigation

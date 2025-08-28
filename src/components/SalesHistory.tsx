@@ -20,11 +20,11 @@ export const SalesHistory: React.FC<SalesHistoryProps> = ({ orders }) => {
   const totalProfit = orders.reduce((sum, order) => sum + order.profit, 0);
 
   return (
-    <div className="p-4 pb-20">
+    <div className="p-4 pb-20 lg:pb-4 lg:pt-6">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Sales History</h1>
       
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -48,6 +48,32 @@ export const SalesHistory: React.FC<SalesHistoryProps> = ({ orders }) => {
             </div>
           </div>
         </div>
+        
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Total Orders</p>
+              <p className="text-2xl font-bold text-purple-600">{orders.length}</p>
+            </div>
+            <div className="p-3 bg-purple-100 rounded-full">
+              <ShoppingBag className="h-6 w-6 text-purple-600" />
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Avg Order</p>
+              <p className="text-2xl font-bold text-orange-600">
+                ₹{orders.length > 0 ? Math.round(totalRevenue / orders.length) : 0}
+              </p>
+            </div>
+            <div className="p-3 bg-orange-100 rounded-full">
+              <Calendar className="h-6 w-6 text-orange-600" />
+            </div>
+          </div>
+        </div>
       </div>
 
       {orders.length === 0 ? (
@@ -57,7 +83,7 @@ export const SalesHistory: React.FC<SalesHistoryProps> = ({ orders }) => {
           <p className="text-gray-400">Start selling to see your history here</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
           {orders.map((order) => (
             <div key={order.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
               <div className="flex justify-between items-start mb-3">
