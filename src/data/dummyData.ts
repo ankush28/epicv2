@@ -55,6 +55,7 @@ export const initialOrders: Order[] = [
   { 
     id: 101, 
     date: "2025-01-28", 
+    customerPhone: "+91 98765 43210",
     items: [{ name: "Football", qty: 2, price: 1300 }], 
     total: 1300, 
     profit: 500 
@@ -69,6 +70,7 @@ export const initialOrders: Order[] = [
   { 
     id: 103, 
     date: "2025-01-26", 
+    customerPhone: "+91 87654 32109",
     items: [
       { name: "Tennis Racket", qty: 1, price: 2200 },
       { name: "Basketball", qty: 2, price: 1900 }

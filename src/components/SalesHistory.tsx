@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, DollarSign, TrendingUp, ShoppingBag } from 'lucide-react';
+import { Calendar, DollarSign, TrendingUp, ShoppingBag, Phone } from 'lucide-react';
 import { Order } from '../types';
 
 interface SalesHistoryProps {
@@ -65,6 +65,12 @@ export const SalesHistory: React.FC<SalesHistoryProps> = ({ orders }) => {
                   <Calendar className="h-4 w-4 text-gray-500" />
                   <span className="text-sm text-gray-600">{formatDate(order.date)}</span>
                 </div>
+                {order.customerPhone && (
+                  <div className="flex items-center space-x-1 text-sm text-gray-600">
+                    <Phone className="h-3 w-3" />
+                    <span>{order.customerPhone}</span>
+                  </div>
+                )}
                 <span className="text-sm font-medium text-gray-500">#{order.id}</span>
               </div>
               
