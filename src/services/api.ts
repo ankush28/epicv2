@@ -57,25 +57,21 @@ export class ApiService {
     return response.json();
   }
 
-  // Example of authenticated request
-  static async makeAuthenticatedRequest(url: string, options: RequestInit = {}) {
+  static async getAllProducts() {
     const headers = {
       'Content-Type': 'application/json',
-      ...this.getAuthHeaders(),
-      ...options.headers,
+      ...this.getAuthHeaders()
     };
 
-    const response = await fetch(url, {
-      ...options,
+    const response = await fetch(`${API_BASE_URL}/product/all`, {
       headers,
     });
 
     if (response.status === 401) {
-      // Token expired or invalid
       this.clearToken();
       throw new Error('Authentication required');
     }
 
-    return response;
+    return response.json();
   }
 }

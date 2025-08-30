@@ -7,7 +7,7 @@ import { SalesHistory } from './components/SalesHistory';
 import { AddProduct } from './components/AddProduct';
 import { Navigation } from './components/Navigation';
 import { ApiService } from './services/api';
-import { initialProducts, initialOrders } from './data/dummyData';
+import { initialOrders } from './data/dummyData';
 import { Product, CartItem, Order, ActiveTab, OrderItem } from './types';
 
 function App() {
@@ -15,7 +15,7 @@ function App() {
   const [showOTPVerification, setShowOTPVerification] = useState(false);
   const [loginEmail, setLoginEmail] = useState('');
   const [activeTab, setActiveTab] = useState<ActiveTab>('products');
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [products, setProducts] = useState<Product[]>([]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>(initialOrders);
 
@@ -25,28 +25,32 @@ function App() {
     const token = ApiService.getToken();
     if (token) {
       setIsAuthenticated(true);
+      loadProducts();
+      
     }
     
-    const savedProducts = localStorage.getItem('pos-products');
     const savedOrders = localStorage.getItem('pos-orders');
-    
-    if (savedProducts) {
-      setProducts(JSON.parse(savedProducts));
-    }
     
     if (savedOrders) {
       setOrders(JSON.parse(savedOrders));
     }
   }, []);
 
-  // Save to localStorage whenever data changes
-  useEffect(() => {
-    localStorage.setItem('pos-products', JSON.stringify(products));
-  }, [products]);
-
-  useEffect(() => {
-    localStorage.setItem('pos-orders', JSON.stringify(orders));
-  }, [orders]);
+  const loadProducts = async () => {
+    try {
+      const response = await ApiService.getAllProducts();
+      console.log('API Response:', response);
+      if (response.success) {
+        const data = response.data;
+        console.log('Products data:', data);
+        setProducts(data);
+      } else {
+        console.error('API response not successful:', response);
+      }
+    } catch (error) {
+      console.error('Failed to load products:', error);
+    }
+  };
 
   const handleOTPRequired = (email: string) => {
     setLoginEmail(email);
@@ -57,6 +61,7 @@ function App() {
     setIsAuthenticated(true);
     setShowOTPVerification(false);
     setLoginEmail('');
+    loadProducts();
   };
 
   const handleBackToLogin = () => {
@@ -81,7 +86,7 @@ function App() {
     };
     
     setProducts(prev => [...prev, productWithId]);
-    setActiveTab('products'); // Switch back to products view
+    setActiveTab('products');
   };
   const handleAddToCart = (product: Product) => {
     if (product.quantity === 0) return;
@@ -232,7 +237,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-md lg:max-w-6xl mx-auto bg-white min-h-screen lg:shadow-lg">
+      <div className="max-w-md lg:max-w-[100%] mx-auto lg:flex-col lg:flex lg:justify-between bg-white min-h-screen lg:shadow-lg">
         {renderActiveTab()}
         
         <Navigation
