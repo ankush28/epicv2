@@ -72,7 +72,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({ onUploadComplete }) => {
             <li><strong>category</strong> - Product category (required)</li>
             <li><strong>wholesalePrice</strong> - Wholesale price (required)</li>
             <li><strong>retailPrice</strong> - Retail price (required)</li>
-            <li><strong>sizes</strong> - JSON format: [{"size":"M","quantity":10}]</li>
+            <li><strong>sizes</strong> - JSON format: {`[{"size":"M","quantity":10}]`}</li>
             <li><strong>description</strong> - Product description (optional)</li>
             <li><strong>brand</strong> - Brand name (optional)</li>
             <li><strong>barcode</strong> - Product barcode (optional)</li>
