@@ -8,8 +8,7 @@ import { AddProduct } from './components/AddProduct';
 import { ManageProducts } from './components/ManageProducts';
 import { Navigation } from './components/Navigation';
 import { ApiService } from './services/api';
-import { initialOrders } from './data/dummyData';
-import { Product, CartItem, Order, ActiveTab, OrderItem } from './types';
+import { Product, CartItem, Order, ActiveTab } from './types';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -19,7 +18,6 @@ function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('products');
   const [products, setProducts] = useState<Product[]>([]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -28,11 +26,6 @@ function App() {
     if (token) {
       setIsAuthenticated(true);
       loadProducts();
-    }
-    
-    const savedOrders = localStorage.getItem('pos-orders');
-    if (savedOrders) {
-      setOrders(JSON.parse(savedOrders));
     }
     
     setIsLoading(false);
@@ -80,26 +73,16 @@ function App() {
     setActiveTab('products'); // Reset to products tab
   };
 
-  const handleAddProduct = (newProduct: Omit<Product, 'id'>) => {
-    const maxId = products.length > 0 ? Math.max(...products.map(p => p.id)) : 0;
-    const productWithId: Product = {
-      ...newProduct,
-      id: maxId + 1
-    };
-    
-    setProducts(prev => [...prev, productWithId]);
-    setActiveTab('products');
-  };
   const handleAddToCart = (product: Product) => {
     if (product.quantity === 0) return;
     
     setCartItems(prev => {
-      const existingItem = prev.find(item => item.id === product.id);
+      const existingItem = prev.find(item => item._id === product._id);
       
       if (existingItem) {
         if (existingItem.cartQuantity < product.quantity) {
           return prev.map(item =>
-            item.id === product.id
+            item._id === product._id
               ? { ...item, cartQuantity: item.cartQuantity + 1 }
               : item
           );
@@ -111,7 +94,7 @@ function App() {
     });
   };
 
-  const handleUpdateQuantity = (id: number, quantity: number) => {
+  const handleUpdateQuantity = (id: string, quantity: number) => {
     if (quantity <= 0) {
       handleRemoveItem(id);
       return;
@@ -119,75 +102,61 @@ function App() {
     
     setCartItems(prev =>
       prev.map(item =>
-        item.id === id ? { ...item, cartQuantity: quantity } : item
+        item._id === id ? { ...item, cartQuantity: quantity } : item
       )
     );
   };
 
-  const handleRemoveItem = (id: number) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
+  const handleRemoveItem = (id: string) => {
+    setCartItems(prev => prev.filter(item => item._id !== id));
   };
 
-  const handleConfirmSale = (customerPhone?: string) => {
+  const handleConfirmSale = async (orderData: {
+    customerPhone?: string;
+    paymentMethod: 'CASH' | 'UPI';
+    discount?: number;
+    notes?: string;
+  }) => {
     if (cartItems.length === 0) return;
 
-    // Calculate totals
-    const totalAmount = cartItems.reduce(
-      (sum, item) => sum + item.retailPrice * item.cartQuantity,
-      0
-    );
-    
-    const totalProfit = cartItems.reduce(
-      (sum, item) => sum + (item.retailPrice - item.wholesalePrice) * item.cartQuantity,
-      0
-    );
-
-    // Create order items
-    const orderItems: OrderItem[] = cartItems.map(item => ({
-      name: item.name,
+    // Create order items for API
+    const orderItems = cartItems.map(item => ({
+      product: item._id,
       qty: item.cartQuantity,
-      price: item.retailPrice * item.cartQuantity
+      price: item.retailPrice
     }));
 
-    // Create new order
-    const newOrder: Order = {
-      id: Math.max(...orders.map(o => o.id), 100) + 1,
-      date: new Date().toISOString().split('T')[0],
-      customerPhone,
+    const apiOrderData = {
       items: orderItems,
-      total: totalAmount,
-      profit: totalProfit
+      ...orderData
     };
 
-    // Update products inventory
-    setProducts(prev =>
-      prev.map(product => {
-        const cartItem = cartItems.find(item => item.id === product.id);
-        if (cartItem) {
-          return {
-            ...product,
-            quantity: product.quantity - cartItem.cartQuantity
-          };
-        }
-        return product;
-      })
-    );
-
-    // Add order to history (newest first)
-    setOrders(prev => [newOrder, ...prev]);
-
-    // Clear cart
-    setCartItems([]);
-
-    // Switch to history tab to show the completed sale
-    setActiveTab('history');
-
-    // Show success feedback
-    alert('Sale completed successfully!');
+    try {
+      const response = await ApiService.createOrder(apiOrderData);
+      
+      if (response._id) {
+        // Reload products to get updated inventory
+        await loadProducts();
+        
+        // Clear cart
+        setCartItems([]);
+        
+        // Switch to history tab to show the completed sale
+        setActiveTab('history');
+        
+        // Show success feedback
+        alert('Order created successfully!');
+      } else {
+        alert('Failed to create order');
+      }
+    } catch (error) {
+      console.error('Error creating order:', error);
+      alert('Error creating order. Please try again.');
+    }
   };
 
+
   const cartItemsCount = cartItems.reduce((sum, item) => sum + item.cartQuantity, 0);
-  const existingCategories = Array.from(new Set(products.map(product => product.category)));
 
   // Show loading screen while checking authentication
   if (isLoading) {
@@ -240,7 +209,7 @@ function App() {
           />
         );
       case 'history':
-        return <SalesHistory orders={orders} />;
+        return <SalesHistory />;
       case 'manage-products':
         return (
           <ManageProducts

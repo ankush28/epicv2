@@ -35,18 +35,42 @@ export interface CartItem extends Product {
 }
 
 export interface OrderItem {
-  name: string;
+  product: string; // Product ID for API
   qty: number;
   price: number;
+  subtotal?: number;
 }
 
 export interface Order {
-  id: number;
+  _id: string;
   date: string;
-  customerPhone?: string;
   items: OrderItem[];
   total: number;
   profit: number;
+  customerPhone?: string;
+  paymentStatus: 'PENDING' | 'PAID' | 'CANCELLED';
+  paymentMethod: 'CASH' | 'UPI';
+  discount?: number;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface OrderResponse {
+  orders: Order[];
+  analytics: {
+    totalOrders: number;
+    totalRevenue: number;
+    totalProfit: number;
+    avgOrderPrice: number;
+  };
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
 }
 
 export interface UploadBatch {
@@ -66,24 +90,7 @@ export interface QuantityChange {
   newQuantity: number;
 }
 
-export interface UploadBatch {
-  _id: string;
-  uploadId: string;
-  fileName: string;
-  fileHash: string;
-  productIds: string[];
-  quantityChanges: QuantityChange[];
-  uploadedAt: string;
-}
-
-export interface QuantityChange {
-  productId: string;
-  size: string;
-  oldQuantity: number;
-  newQuantity: number;
-}
-
-export type ActiveTab = 'products' | 'cart' | 'history' | 'manage-products';
+export type ActiveTab = 'products' | 'cart' | 'history' | 'manage-products' | 'settings';
 
 export interface AuthResponse {
   success: boolean;

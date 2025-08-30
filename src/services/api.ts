@@ -25,6 +25,7 @@ export class ApiService {
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
+  // Authentication APIs
   static async login(email: string, password: string) {
     const response = await fetch(`${API_BASE_URL}/user/login`, {
       method: 'POST',
@@ -57,6 +58,7 @@ export class ApiService {
     return response.json();
   }
 
+  // Product APIs
   static async getAllProducts() {
     const headers = {
       'Content-Type': 'application/json',
@@ -201,6 +203,102 @@ export class ApiService {
     const response = await fetch(`${API_BASE_URL}/product/bulk/rollback/${uploadId}`, {
       method: 'DELETE',
       headers,
+    });
+
+    if (response.status === 401) {
+      this.clearToken();
+      throw new Error('Authentication required');
+    }
+
+    return response.json();
+  }
+
+  // Order APIs
+  static async createOrder(orderData: {
+    items: { product: string; qty: number; price: number }[];
+    customerPhone?: string;
+    paymentMethod: 'CASH' | 'UPI';
+    discount?: number;
+    notes?: string;
+  }) {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...this.getAuthHeaders()
+    };
+
+    const response = await fetch(`${API_BASE_URL}/orders`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(orderData),
+    });
+
+    if (response.status === 401) {
+      this.clearToken();
+      throw new Error('Authentication required');
+    }
+
+    return response.json();
+  }
+
+  static async getAllOrders(params?: {
+    from?: string;
+    to?: string;
+    paymentStatus?: 'PENDING' | 'PAID' | 'CANCELLED';
+    page?: number;
+    limit?: number;
+  }) {
+    const queryParams = new URLSearchParams();
+    if (params?.from) queryParams.append('from', params.from);
+    if (params?.to) queryParams.append('to', params.to);
+    if (params?.paymentStatus) queryParams.append('paymentStatus', params.paymentStatus);
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+    const headers = {
+      'Content-Type': 'application/json',
+      ...this.getAuthHeaders()
+    };
+
+    const response = await fetch(`${API_BASE_URL}/orders?${queryParams}`, {
+      headers,
+    });
+
+    if (response.status === 401) {
+      this.clearToken();
+      throw new Error('Authentication required');
+    }
+
+    return response.json();
+  }
+
+  static async getOrder(id: string) {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...this.getAuthHeaders()
+    };
+
+    const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
+      headers,
+    });
+
+    if (response.status === 401) {
+      this.clearToken();
+      throw new Error('Authentication required');
+    }
+
+    return response.json();
+  }
+
+  static async updateOrder(id: string, orderData: any) {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...this.getAuthHeaders()
+    };
+
+    const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(orderData),
     });
 
     if (response.status === 401) {
