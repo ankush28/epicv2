@@ -74,4 +74,140 @@ export class ApiService {
 
     return response.json();
   }
+
+  static async getProduct(id: string) {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...this.getAuthHeaders()
+    };
+
+    const response = await fetch(`${API_BASE_URL}/product/${id}`, {
+      headers,
+    });
+
+    if (response.status === 401) {
+      this.clearToken();
+      throw new Error('Authentication required');
+    }
+
+    return response.json();
+  }
+
+  static async addProduct(productData: any) {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...this.getAuthHeaders()
+    };
+
+    const response = await fetch(`${API_BASE_URL}/product/add`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(productData),
+    });
+
+    if (response.status === 401) {
+      this.clearToken();
+      throw new Error('Authentication required');
+    }
+
+    return response.json();
+  }
+
+  static async updateProduct(id: string, productData: any) {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...this.getAuthHeaders()
+    };
+
+    const response = await fetch(`${API_BASE_URL}/product/update/${id}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(productData),
+    });
+
+    if (response.status === 401) {
+      this.clearToken();
+      throw new Error('Authentication required');
+    }
+
+    return response.json();
+  }
+
+  static async deleteProduct(id: string) {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...this.getAuthHeaders()
+    };
+
+    const response = await fetch(`${API_BASE_URL}/product/delete/${id}`, {
+      method: 'DELETE',
+      headers,
+    });
+
+    if (response.status === 401) {
+      this.clearToken();
+      throw new Error('Authentication required');
+    }
+
+    return response.json();
+  }
+
+  static async bulkUploadProducts(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const headers = {
+      ...this.getAuthHeaders()
+    };
+
+    const response = await fetch(`${API_BASE_URL}/product/bulk/add`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (response.status === 401) {
+      this.clearToken();
+      throw new Error('Authentication required');
+    }
+
+    return response.json();
+  }
+
+  static async getUploadBatches() {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...this.getAuthHeaders()
+    };
+
+    const response = await fetch(`${API_BASE_URL}/product/bulk/batches`, {
+      headers,
+    });
+
+    if (response.status === 401) {
+      this.clearToken();
+      throw new Error('Authentication required');
+    }
+
+    return response.json();
+  }
+
+  static async rollbackUpload(uploadId: string) {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...this.getAuthHeaders()
+    };
+
+    const response = await fetch(`${API_BASE_URL}/product/bulk/rollback/${uploadId}`, {
+      method: 'DELETE',
+      headers,
+    });
+
+    if (response.status === 401) {
+      this.clearToken();
+      throw new Error('Authentication required');
+    }
+
+    return response.json();
+  }
 }
