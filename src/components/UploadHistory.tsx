@@ -82,7 +82,7 @@ export const UploadHistory: React.FC<UploadHistoryProps> = ({ onRollbackComplete
         <div className="space-y-4">
           {batches.map((batch) => (
             <div key={batch._id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-start justify-between">
+              <div style={{ position: 'relative' }}>
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-3">
                     <FileSpreadsheet className="h-6 w-6 text-blue-600" />
@@ -146,7 +146,7 @@ export const UploadHistory: React.FC<UploadHistoryProps> = ({ onRollbackComplete
                 </div>
 
                 {/* Rollback Button */}
-                <div className="ml-4">
+                <div style={{ position: 'absolute', top: '0px', right: '0px' }} className="ml-4">
                   <button
                     onClick={() => handleRollback(batch.uploadId, batch.fileName)}
                     disabled={rollbackingId === batch.uploadId}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Edit, Trash2, Plus, Upload, History, ArrowLeft } from 'lucide-react';
+import { Search, Filter, Edit, Trash2, Plus, Upload, History, ArrowLeft, Package } from 'lucide-react';
 import { Product } from '../types';
 import { ApiService } from '../services/api';
 import { EditProduct } from './EditProduct';

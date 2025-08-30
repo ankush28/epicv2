@@ -83,7 +83,7 @@ export interface QuantityChange {
   newQuantity: number;
 }
 
-export type ActiveTab = 'products' | 'cart' | 'history' | 'add-product' | 'manage-products';
+export type ActiveTab = 'products' | 'cart' | 'history' | 'manage-products';
 
 export interface AuthResponse {
   success: boolean;

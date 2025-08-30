@@ -18,8 +18,7 @@ export const Navigation: React.FC<NavigationProps> = ({
   const tabs = [
     { id: 'products' as ActiveTab, label: 'Products', icon: Package },
     { id: 'cart' as ActiveTab, label: 'Cart', icon: ShoppingCart },
-    { id: 'history' as ActiveTab, label: 'History', icon: BarChart3 },
-    { id: 'add-product' as ActiveTab, label: 'Add', icon: Plus }
+    { id: 'history' as ActiveTab, label: 'History', icon: BarChart3 }
   ];
 
   return (

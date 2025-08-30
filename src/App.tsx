@@ -13,6 +13,7 @@ import { Product, CartItem, Order, ActiveTab, OrderItem } from './types';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [showOTPVerification, setShowOTPVerification] = useState(false);
   const [loginEmail, setLoginEmail] = useState('');
   const [activeTab, setActiveTab] = useState<ActiveTab>('products');
@@ -27,14 +28,14 @@ function App() {
     if (token) {
       setIsAuthenticated(true);
       loadProducts();
-      
     }
     
     const savedOrders = localStorage.getItem('pos-orders');
-    
     if (savedOrders) {
       setOrders(JSON.parse(savedOrders));
     }
+    
+    setIsLoading(false);
   }, []);
 
   const loadProducts = async () => {
@@ -188,6 +189,15 @@ function App() {
   const cartItemsCount = cartItems.reduce((sum, item) => sum + item.cartQuantity, 0);
   const existingCategories = Array.from(new Set(products.map(product => product.category)));
 
+  // Show loading screen while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   // Show OTP verification screen
   if (showOTPVerification) {
     return (
@@ -231,13 +241,6 @@ function App() {
         );
       case 'history':
         return <SalesHistory orders={orders} />;
-      case 'add-product':
-        return (
-          <AddProduct
-            onAddProduct={handleAddProduct}
-            existingCategories={existingCategories}
-          />
-        );
       case 'manage-products':
         return (
           <ManageProducts
