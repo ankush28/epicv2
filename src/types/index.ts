@@ -66,6 +66,23 @@ export interface QuantityChange {
   newQuantity: number;
 }
 
+export interface UploadBatch {
+  _id: string;
+  uploadId: string;
+  fileName: string;
+  fileHash: string;
+  productIds: string[];
+  quantityChanges: QuantityChange[];
+  uploadedAt: string;
+}
+
+export interface QuantityChange {
+  productId: string;
+  size: string;
+  oldQuantity: number;
+  newQuantity: number;
+}
+
 export type ActiveTab = 'products' | 'cart' | 'history' | 'add-product' | 'manage-products';
 
 export interface AuthResponse {

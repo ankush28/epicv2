@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
-import { Search, ShoppingCart, Package, Filter } from 'lucide-react';
+import { Search, ShoppingCart, Package, Filter, Menu } from 'lucide-react';
 import { Product } from '../types';
+import { BurgerMenu } from './BurgerMenu';
+import { ActiveTab } from '../types';
 
 interface ProductsDashboardProps {
   products: Product[];
   onAddToCart: (product: Product) => void;
+  onNavigate: (tab: ActiveTab) => void;
+  onLogout: () => void;
 }
 
 export const ProductsDashboard: React.FC<ProductsDashboardProps> = ({
   products,
-  onAddToCart
+  onAddToCart,
+  onNavigate,
+  onLogout
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -33,7 +39,10 @@ export const ProductsDashboard: React.FC<ProductsDashboardProps> = ({
   return (
     <div className="p-4 pb-20 lg:pb-4 lg:pt-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Products</h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+          <BurgerMenu onNavigate={onNavigate} onLogout={onLogout} />
+        </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
           <div className="relative">

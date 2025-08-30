@@ -5,6 +5,7 @@ import { ProductsDashboard } from './components/ProductsDashboard';
 import { Cart } from './components/Cart';
 import { SalesHistory } from './components/SalesHistory';
 import { AddProduct } from './components/AddProduct';
+import { ManageProducts } from './components/ManageProducts';
 import { Navigation } from './components/Navigation';
 import { ApiService } from './services/api';
 import { initialOrders } from './data/dummyData';
@@ -211,7 +212,14 @@ function App() {
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'products':
-        return <ProductsDashboard products={products} onAddToCart={handleAddToCart} />;
+        return (
+          <ProductsDashboard 
+            products={products} 
+            onAddToCart={handleAddToCart}
+            onNavigate={setActiveTab}
+            onLogout={handleLogout}
+          />
+        );
       case 'cart':
         return (
           <Cart
@@ -230,8 +238,22 @@ function App() {
             existingCategories={existingCategories}
           />
         );
+      case 'manage-products':
+        return (
+          <ManageProducts
+            products={products}
+            onProductsChange={loadProducts}
+          />
+        );
       default:
-        return <ProductsDashboard products={products} onAddToCart={handleAddToCart} />;
+        return (
+          <ProductsDashboard 
+            products={products} 
+            onAddToCart={handleAddToCart}
+            onNavigate={setActiveTab}
+            onLogout={handleLogout}
+          />
+        );
     }
   };
 
